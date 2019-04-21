@@ -2,8 +2,25 @@
     <string name="app_name">GezginApp</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_title">Gezgin APP</string>
+    <string name="nav_header_subtitle">gezgin@gezgin.con</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+
+    <!-- Firebase Referance -->
+    <string name="travel">Travel</string>
+    <string name="user">User</string>
+    <string name="name">Name</string>
+    <string name="mail">Mail</string>
+    <string name="story">Story</string>
+    <string name="photo">Photo</string>
+    <string name="title">Title</string>
+    <string name="date">Date</string>
+    <string name="like">Like</string>
+
 </resources>
