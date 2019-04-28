@@ -3,6 +3,7 @@ package com.a.gezginapp;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.a.gezginapp.Model.StoryModel;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,28 +31,35 @@ public class HomeFragment extends Fragment {
 
         final TextView tvTitle=(TextView)view.findViewById(R.id.tvTitle);
 
-        //firebase veritabanı yazma
+       /* //firebase veritabanı yazma
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("gyk");
-
+*/
         //myRef.setValue("Selam");
 
+        DatabaseReference databaseReference=FirebaseDatabase.getInstance()
+                .getReference(getString(R.string.travel))
+                .child(getString(R.string.user));
+                //.push()
+                //.child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                //.child(getString(R.string.story));
 
         // firebase veritabanı okuma
-        myRef.addValueEventListener(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                String value = dataSnapshot.getValue(String.class);
-                Log.d("firebase", "BANA NE GETİRDİN: " + value);
-                tvTitle.setText(value);
 
+                for (DataSnapshot ds:dataSnapshot.getChildren()){
+
+                    StoryModel model=ds.getValue(StoryModel.class);
+                    tvTitle.setText(model.getTitle());
+                }
             }
 
             @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                Log.w("firebase", "Failed to read value.", error.toException());
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
             }
         });
 

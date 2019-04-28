@@ -40,7 +40,8 @@ public class AddStoryActivity extends AppCompatActivity {
     private static  final int GALLERY_INTENT=61;
     Uri filePath;
     private StorageReference mStorageRef;
-    String photoUrl;
+    DatabaseReference myRef;
+    String uniqId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,9 +50,7 @@ public class AddStoryActivity extends AppCompatActivity {
         ivStory=(ImageView)findViewById(R.id.ivStory);
         etTitle=(EditText)findViewById(R.id.etTitle);
         btSend=(Button)findViewById(R.id.btSend);
-        mStorageRef = FirebaseStorage.getInstance()
-                .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
 
 
         ivStory.setOnClickListener(new View.OnClickListener() {
@@ -66,23 +65,20 @@ public class AddStoryActivity extends AppCompatActivity {
         btSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!etTitle.getText().toString().equals("")) {
+                if (!etTitle.getText().toString().equals("")&& filePath!=null) {
 
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference myRef = database.getReference(getString(R.string.travel))
+                     myRef = database.getReference(getString(R.string.travel))
                             .child(getString(R.string.user))
                             .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                             .child(getString(R.string.story));
 
-                    String uniqId = myRef.push().getKey();
+                     uniqId = myRef.push().getKey();
+                    mStorageRef = FirebaseStorage.getInstance()
+                            .getReference(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                            .child(uniqId);
+                    uploadFile();
 
-                    StoryModel storyModel = new StoryModel(
-                            "Ünal Zafer",
-                            photoUrl,
-                            Calendar.getInstance().getTime().toString(),
-                            "2",
-                            etTitle.getText().toString());
-                    myRef.child(uniqId).setValue(storyModel);
                 /*myRef.child(getString(R.string.name)).setValue("Ünal Zafer");
                 myRef.child(getString(R.string.photo)).setValue("Photo Url");
                 myRef.child(getString(R.string.title)).setValue(etTitle.getText().toString());
@@ -106,7 +102,7 @@ public class AddStoryActivity extends AppCompatActivity {
                     //finish();
                 }
                 else{
-                    Toast.makeText(getApplicationContext(),"Title Boş Girilemez",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Açıklama ve Fotoğraf Boş Girilemez",Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -120,7 +116,7 @@ public class AddStoryActivity extends AppCompatActivity {
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
                 ivStory.setImageBitmap(bitmap);
-                uploadFile();
+                //uploadFile();
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -147,36 +143,15 @@ public class AddStoryActivity extends AppCompatActivity {
             progressDialog.show();
 
 
-            mStorageRef.putFile(filePath)
-                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            progressDialog.dismiss();
-
-                            getUrlStorage();
-                            //Toast.makeText(getApplicationContext(), "Resim Yüklendi ", Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception exception) {
-
-                            progressDialog.dismiss();
+            mStorageRef.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                    progressDialog.dismiss();
+                    getUrlStorage();
+                }
+            });
 
 
-                            Toast.makeText(getApplicationContext(),"Resim Yüklenemedi: "+exception.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    })
-                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-
-                            double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
-
-
-                            progressDialog.setMessage("Yükleniyor " + ((int) progress) + "%...");
-                        }
-                    });
         }
         else {
 
@@ -186,17 +161,13 @@ public class AddStoryActivity extends AppCompatActivity {
         mStorageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-
-                //Resim yüklendikten sonra linki alıp database'imize yazıyoruz
-                //writeUser(pushDatabaseId,etTitle.getText().toString(), etText.getText().toString(), uri.toString(), color);
-                photoUrl=uri.toString();
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // hata var ise
-                Toast.makeText(getApplicationContext(),"Url Bulunamadı: "+exception.getMessage(), Toast.LENGTH_LONG).show();
+                StoryModel storyModel = new StoryModel(
+                        "Ünal Zafer",
+                        uri.toString(),
+                        Calendar.getInstance().getTime().toString(),
+                        "2",
+                        etTitle.getText().toString());
+                myRef.child(uniqId).setValue(storyModel);
             }
         });
     }

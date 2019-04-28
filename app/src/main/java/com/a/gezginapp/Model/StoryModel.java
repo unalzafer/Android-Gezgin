@@ -8,6 +8,9 @@ public class StoryModel {
     String like;
     String title;
 
+    public StoryModel() {
+    }
+
     public StoryModel(String name, String photo, String date, String like, String title) {
         this.name = name;
         this.photo = photo;
