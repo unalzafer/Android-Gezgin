@@ -33,6 +33,13 @@ public class Login extends AppCompatActivity {
         mAuth =FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
+        Bundle bundle=getIntent().getExtras();
+        if(bundle!=null){
+            etMail.setText(bundle.getString("email"));
+            etPassword.setText(bundle.getString("password"));
+        }
+
+        // eğer firebase user değeri var ise otomatik giriş yap anasayfaya gönder
         if (!(user == null))
         {
             intent();

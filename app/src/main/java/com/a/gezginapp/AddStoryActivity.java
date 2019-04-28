@@ -136,17 +136,11 @@ public class AddStoryActivity extends AppCompatActivity {
 
         if (filePath != null) {
 
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Not Ekleniyor");
-            progressDialog.setMessage("Lütfen bekleyiniz...");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
 
 
             mStorageRef.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    progressDialog.dismiss();
                     getUrlStorage();
                 }
             });
